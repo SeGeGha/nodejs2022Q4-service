@@ -34,3 +34,5 @@ test/artists.e2e.spec.ts
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+.env
