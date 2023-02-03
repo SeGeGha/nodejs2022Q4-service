@@ -23,13 +23,13 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get()
-  async getAll(): Promise<User[]> {
-    return this.usersService.getAll();
+  async findAll(): Promise<User[]> {
+    return this.usersService.findAll();
   }
 
   @Get(':id')
-  async getOne(@Param('id', new ParseUUIDPipe()) id): Promise<User> {
-    const user = await this.usersService.getById(id);
+  async findOne(@Param('id', new ParseUUIDPipe()) id): Promise<User> {
+    const user = await this.usersService.findOne(id);
 
     if (user) {
       return user;

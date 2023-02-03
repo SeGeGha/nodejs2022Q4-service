@@ -9,11 +9,11 @@ import { INITIAL_VERSION, MESSAGES } from '../constants';
 export class UsersService {
   private users: User[] = [];
 
-  async getAll(): Promise<User[]> {
+  async findAll(): Promise<User[]> {
     return this.users;
   }
 
-  async getById(id: string): Promise<User | null> {
+  async findOne(id: string): Promise<User | null> {
     return this.users.find((user) => user.id === id) ?? null;
   }
 
