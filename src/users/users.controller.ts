@@ -11,13 +11,16 @@ import {
   HttpCode,
   HttpStatus,
   ForbiddenException,
+  UseInterceptors,
 } from '@nestjs/common';
+import { ExcludePasswordInterceptor } from './interceptors/exclude-password.interceptor';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { MESSAGES } from '../constants';
 
+@UseInterceptors(ExcludePasswordInterceptor)
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
@@ -58,16 +61,18 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<User> {
-    try {
-      const updatedUser = await this.usersService.update(id, updateUserDto);
+    let updatedUser;
 
-      if (updatedUser) {
-        return updatedUser;
-      } else {
-        throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
-      }
+    try {
+      updatedUser = await this.usersService.update(id, updateUserDto);
     } catch (error) {
       throw new ForbiddenException(error.message);
+    }
+
+    if (updatedUser) {
+      return updatedUser;
+    } else {
+      throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
     }
   }
 }
