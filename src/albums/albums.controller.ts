@@ -10,6 +10,7 @@ import {
   NotFoundException,
   HttpCode,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -39,7 +40,12 @@ export class AlbumsController {
 
   @Post()
   async create(@Body() createAlbumDto: CreateAlbumDto): Promise<Album> {
-    return this.albumsService.create(createAlbumDto);
+    try {
+      const newAlbum = await this.albumsService.create(createAlbumDto);
+      return newAlbum;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Delete(':id')
@@ -57,12 +63,16 @@ export class AlbumsController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ): Promise<Album> {
-    const updatedAlbum = await this.albumsService.update(id, updateAlbumDto);
+    try {
+      const updatedAlbum = await this.albumsService.update(id, updateAlbumDto);
 
-    if (updatedAlbum) {
-      return updatedAlbum;
-    } else {
-      throw new NotFoundException(MESSAGES.ALBUM_NOT_FOUND);
+      if (updatedAlbum) {
+        return updatedAlbum;
+      } else {
+        throw new NotFoundException(MESSAGES.ALBUM_NOT_FOUND);
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
   }
 }

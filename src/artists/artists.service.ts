@@ -1,12 +1,21 @@
 import { v4 } from 'uuid';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
+import { Artist } from './entities/artist.entity';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { Artist } from './entities/artist.entity';
+import { AlbumsService } from '../albums/albums.service';
 
 @Injectable()
-export class ArtistsService {
+export class ArtistsService implements OnModuleInit {
+  private albumsService: AlbumsService;
   private artists: Artist[] = [];
+
+  constructor(private moduleRef: ModuleRef) { }
+
+  onModuleInit() {
+    this.albumsService = this.moduleRef.get(AlbumsService, { strict: false });
+  }
 
   async findAll(): Promise<Artist[]> {
     return this.artists;
@@ -30,6 +39,14 @@ export class ArtistsService {
   async remove(id: string): Promise<Artist | null> {
     const idx = this.artists.findIndex((user) => user.id === id);
     if (idx === -1) return null;
+
+    const albums = await this.albumsService.findMany(id);
+
+    await Promise.all(
+      albums.map((album) => {
+        return this.albumsService.update(album.id, { artistId: null });
+      }),
+    );
 
     const [removedUser] = this.artists.splice(idx, 1);
 
