@@ -16,7 +16,7 @@ export class FavoritesService implements OnModuleInit {
   private tracksService: TracksService;
   private favorites = new Favorite();
 
-  constructor(private moduleRef: ModuleRef) {}
+  constructor(private moduleRef: ModuleRef) { }
 
   onModuleInit() {
     this.artistsService = this.moduleRef.get(ArtistsService, { strict: false });
@@ -47,7 +47,9 @@ export class FavoritesService implements OnModuleInit {
     const service: ServicesRef = this[`${entityType}Service`];
     const resource = await service.findOne(id);
     if (!resource) {
-      throw new Error(MESSAGES[`${entityType.slice(0, -1)}_NOT_FOUND`]);
+      throw new Error(
+        MESSAGES[`${entityType.slice(0, -1).toUpperCase()}_NOT_FOUND`],
+      );
     }
 
     this.favorites[entityType].push(id);
@@ -72,7 +74,9 @@ export class FavoritesService implements OnModuleInit {
       (resourceId) => resourceId === id,
     );
     if (idx === -1) {
-      throw new Error(MESSAGES[`${entityType.slice(0, -1)}_NOT_FOUND`]);
+      throw new Error(
+        MESSAGES[`${entityType.slice(0, -1).toUpperCase()}_NOT_FOUND`],
+      );
     }
 
     this.favorites[entityType].splice(idx, 1);
