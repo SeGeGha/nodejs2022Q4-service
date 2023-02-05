@@ -10,6 +10,7 @@ import {
   NotFoundException,
   HttpCode,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -39,12 +40,18 @@ export class TracksController {
 
   @Post()
   async create(@Body() createTrackDto: CreateTrackDto): Promise<Track> {
-    return this.tracksService.create(createTrackDto);
+    try {
+      const newTrack = await this.tracksService.create(createTrackDto);
+
+      return newTrack;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
     const removedTrack = await this.tracksService.remove(id);
 
     if (!removedTrack) {
@@ -54,10 +61,16 @@ export class TracksController {
 
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
   ): Promise<Track> {
-    const updatedTrack = await this.tracksService.update(id, updateTrackDto);
+    let updatedTrack;
+
+    try {
+      updatedTrack = await this.tracksService.update(id, updateTrackDto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
 
     if (updatedTrack) {
       return updatedTrack;

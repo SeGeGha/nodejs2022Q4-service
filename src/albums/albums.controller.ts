@@ -63,16 +63,18 @@ export class AlbumsController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ): Promise<Album> {
-    try {
-      const updatedAlbum = await this.albumsService.update(id, updateAlbumDto);
+    let updatedAlbum;
 
-      if (updatedAlbum) {
-        return updatedAlbum;
-      } else {
-        throw new NotFoundException(MESSAGES.ALBUM_NOT_FOUND);
-      }
+    try {
+      updatedAlbum = await this.albumsService.update(id, updateAlbumDto);
     } catch (error) {
       throw new BadRequestException(error.message);
+    }
+
+    if (updatedAlbum) {
+      return updatedAlbum;
+    } else {
+      throw new NotFoundException(MESSAGES.ALBUM_NOT_FOUND);
     }
   }
 }
