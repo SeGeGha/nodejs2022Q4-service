@@ -6,4 +6,4 @@ import { TracksController } from './tracks.controller';
   controllers: [TracksController],
   providers: [TracksService],
 })
-export class TracksModule { }
+export class TracksModule {}

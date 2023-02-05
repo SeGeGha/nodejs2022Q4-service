@@ -16,7 +16,7 @@ export class FavoritesService implements OnModuleInit {
   private tracksService: TracksService;
   private favorites = new Favorite();
 
-  constructor(private moduleRef: ModuleRef) { }
+  constructor(private moduleRef: ModuleRef) {}
 
   onModuleInit() {
     this.artistsService = this.moduleRef.get(ArtistsService, { strict: false });

@@ -19,7 +19,7 @@ import { MESSAGES } from '../constants';
 
 @Controller('artist')
 export class ArtistsController {
-  constructor(private readonly artistsService: ArtistsService) { }
+  constructor(private readonly artistsService: ArtistsService) {}
 
   @Get()
   async findAll(): Promise<Artist[]> {

@@ -20,7 +20,7 @@ import { MESSAGES } from '../constants';
 
 @Controller('track')
 export class TracksController {
-  constructor(private readonly tracksService: TracksService) { }
+  constructor(private readonly tracksService: TracksService) {}
 
   @Get()
   async findAll(): Promise<Track[]> {

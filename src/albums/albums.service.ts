@@ -17,7 +17,7 @@ export class AlbumsService implements OnModuleInit {
   private favoritesService: FavoritesService;
   private albums: Album[] = [];
 
-  constructor(private moduleRef: ModuleRef) { }
+  constructor(private moduleRef: ModuleRef) {}
 
   onModuleInit() {
     this.artistsService = this.moduleRef.get(ArtistsService, { strict: false });

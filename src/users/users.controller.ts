@@ -23,7 +23,7 @@ import { MESSAGES } from '../constants';
 @UseInterceptors(ExcludePasswordInterceptor)
 @Controller('user')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Get()
   async findAll(): Promise<User[]> {
