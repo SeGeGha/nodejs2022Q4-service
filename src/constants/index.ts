@@ -9,3 +9,11 @@ export const MESSAGES = {
   WRONG_PASSWORD: 'Wrong old password',
   SAME_PASSWORDS: 'Same passwords',
 };
+
+export enum ENTITIES {
+  USERS = 'users',
+  ARTISTS = 'artists',
+  ALBUMS = 'albums',
+  TRACKS = 'tracks',
+  FAVORITES = 'favorites',
+}
