@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {https://github.com/SeGeGha/nodejs2022Q4-service}
+git clone https://github.com/SeGeGha/nodejs2022Q4-service
 ```
 
 ## Installing NPM modules
@@ -23,7 +23,7 @@ npm install
 
 ## Running application
 
-Rename .env.example to .env. You can set PORT (default 4000). For Swagger UI need set `SWAGGER_YAML_PATH = ../doc/api.yaml`
+Rename .env.example to .env. You can set PORT (default 4000). For Swagger UI need set `SWAGGER_YAML_PATH = ../doc/api.yaml` (specified by default)
 
 ```
 npm start:dev
@@ -67,4 +67,5 @@ npm run format
 ### Moments of the application
 
 - unnecessary DTO fields are truncated and not included in the database models
-
+- successfull POST `favs/*/id` response contains `artists: string[], albums: string[], tracks: string[]`
+- if the artist (album, track) has already been added to favorites, the second addition will be ignored
