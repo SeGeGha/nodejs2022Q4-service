@@ -24,7 +24,6 @@ async function bootstrap() {
   }
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  console.log(SWAGGER_YAML_PATH);
 
   await app.listen(PORT, () => {
     if (!SWAGGER_YAML_PATH) console.error('Missing SWAGGER_YAML_PATH in .env');
