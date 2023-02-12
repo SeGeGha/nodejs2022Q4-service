@@ -3,7 +3,7 @@ version: '3.9'
 services:
   server:
     container_name: server
-    image: nest-service:18-alpine
+    image: nest-service
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,7 +21,7 @@ services:
 
   database:
     container_name: database
-    image: postgres-db:14.7
+    image: postgres-db
     build:
       context: .
       dockerfile: Dockerfile-db
