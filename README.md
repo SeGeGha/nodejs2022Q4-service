@@ -4,6 +4,7 @@
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker - [Download & Install Docker](https://docs.docker.com/engine/install/)
 
 ## Downloading
 
@@ -14,7 +15,7 @@ git clone https://github.com/SeGeGha/nodejs2022Q4-service
 ## Installing NPM modules
 
 ```
-git checkout feat/create-rest-service
+git checkout feat/postgres-and-docker
 ```
 
 ```
@@ -37,6 +38,28 @@ npm start
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
+
+## Docker
+
+Build services
+```
+npm run docker:build
+```
+Start containers
+```
+npm run docker:up
+```
+Run tests in containers
+```
+npm run docker:test
+```
+Scan docker images
+```
+npm run scan:service
+npm run scan:postgres
+```
+
+
 
 ## Testing
 
