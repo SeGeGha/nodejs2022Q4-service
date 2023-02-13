@@ -59,9 +59,7 @@ export class UsersService {
       throw new ForbiddenException(MESSAGES.WRONG_PASSWORD);
     }
 
-    ++user.version;
     user.password = userDto.newPassword;
-    user.updatedAt = new Date();
 
     await this.usersRepository.save(user);
 

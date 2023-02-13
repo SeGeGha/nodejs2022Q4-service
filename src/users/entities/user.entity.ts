@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  VersionColumn,
 } from 'typeorm';
 
 @Entity('user')
@@ -10,19 +12,19 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column()
+  @Column({ update: false })
   readonly login: string;
 
   @Column()
   password: string;
 
-  @Column({ default: 1 })
+  @VersionColumn({ default: 1 })
   version: number;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updatedAt: Date;
 
   toResponse(): UserResponse {
