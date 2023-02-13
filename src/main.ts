@@ -1,4 +1,3 @@
-import * as dotenv from 'dotenv';
 import * as yaml from 'js-yaml';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -8,7 +7,7 @@ import { readFile } from 'fs/promises';
 import { AppModule } from './app.module';
 import { DEFAULT_PORT } from './constants';
 
-dotenv.config();
+import('reflect-metadata');
 
 const { PORT = DEFAULT_PORT, SWAGGER_YAML_PATH } = process.env;
 
