@@ -58,8 +58,9 @@ Scan docker images
 npm run scan:service
 npm run scan:postgres
 ```
+If docker doesn't build images try adding current directory to docker resources as in image
 
-
+![image](https://user-images.githubusercontent.com/21230284/218312899-e039c4ac-0777-46da-9ac4-46829c26341b.png)
 
 ## Testing
 
