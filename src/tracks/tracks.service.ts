@@ -20,7 +20,6 @@ export class TracksService implements OnModuleInit {
   private albumsService: AlbumsService;
   private artistsService: ArtistsService;
   private favoritesService: FavoritesService;
-  private tracks: Track[] = [];
 
   constructor(
     @InjectRepository(Track)
