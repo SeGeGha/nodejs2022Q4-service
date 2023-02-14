@@ -11,15 +11,12 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import { ArtistsService } from '../artists/artists.service';
-import { TracksService } from '../tracks/tracks.service';
 import { FavoritesService } from '../favorites/favorites.service';
-import { Track } from '../tracks/entities/track.entity';
 import { MESSAGES } from '../constants';
 
 @Injectable()
 export class AlbumsService implements OnModuleInit {
   private artistsService: ArtistsService;
-  private tracksService: TracksService;
   private favoritesService: FavoritesService;
 
   constructor(
@@ -30,7 +27,6 @@ export class AlbumsService implements OnModuleInit {
 
   onModuleInit() {
     this.artistsService = this.moduleRef.get(ArtistsService, { strict: false });
-    this.tracksService = this.moduleRef.get(TracksService, { strict: false });
     this.favoritesService = this.moduleRef.get(FavoritesService, {
       strict: false,
     });
@@ -74,18 +70,6 @@ export class AlbumsService implements OnModuleInit {
     }
 
     try {
-      const tracks = await this.tracksService.findAll();
-
-      await Promise.all(
-        tracks.reduce((acc, track) => {
-          if (track.albumId === id) {
-            acc.push(this.tracksService.update(track.id, { albumId: null }));
-          }
-
-          return acc;
-        }, [] as Promise<Track>[]),
-      );
-
       await this.favoritesService.removeAlbum(id);
     } catch (error) { }
   }

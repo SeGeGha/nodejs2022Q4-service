@@ -1,3 +1,4 @@
+import { Album } from 'src/albums/entities/album.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -29,4 +30,10 @@ export class Track {
   })
   @JoinColumn({ name: 'artist_id' })
   artist: Artist;
+
+  @ManyToOne(() => Album, (album) => album.tracks, {
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'album_id' })
+  album: Album;
 }
