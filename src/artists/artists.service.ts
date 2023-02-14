@@ -75,15 +75,15 @@ export class ArtistsService implements OnModuleInit {
         }, [] as Promise<Track>[]),
       );
 
-      await Promise.all(
-        albums.reduce((acc, album) => {
-          if (album.artistId === id) {
-            acc.push(this.albumsService.update(album.id, { artistId: null }));
-          }
+      // await Promise.all(
+      //   albums.reduce((acc, album) => {
+      //     if (album.artistId === id) {
+      //       acc.push(this.albumsService.update(album.id, { artistId: null }));
+      //     }
 
-          return acc;
-        }, [] as Promise<Album>[]),
-      );
+      //     return acc;
+      //   }, [] as Promise<Album>[]),
+      // );
 
       await this.favoritesService.removeArtist(id);
     } catch (error) { }
