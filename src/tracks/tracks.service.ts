@@ -1,5 +1,11 @@
-import { v4 } from 'uuid';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { In, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
@@ -16,7 +22,11 @@ export class TracksService implements OnModuleInit {
   private favoritesService: FavoritesService;
   private tracks: Track[] = [];
 
-  constructor(private moduleRef: ModuleRef) {}
+  constructor(
+    @InjectRepository(Track)
+    private tracksRepository: Repository<Track>,
+    private moduleRef: ModuleRef,
+  ) { }
 
   onModuleInit() {
     this.albumsService = this.moduleRef.get(AlbumsService, { strict: false });
@@ -27,78 +37,73 @@ export class TracksService implements OnModuleInit {
   }
 
   async findAll(): Promise<Track[]> {
-    return this.tracks;
+    return this.tracksRepository.find();
   }
 
   async findManyByIds(ids: string[]): Promise<Track[]> {
-    return this.tracks.filter((track) => ids.includes(track.id));
+    return this.tracksRepository.findBy({ id: In(ids) });
   }
 
   async findOne(id: string): Promise<Track | null> {
-    return this.tracks.find((track) => track.id === id) ?? null;
+    const track = await this.tracksRepository.findOne({ where: { id } });
+
+    if (track) return track;
+
+    throw new NotFoundException(MESSAGES.TRACK_NOT_FOUND);
   }
 
   async create(createTrackDto: CreateTrackDto): Promise<Track> {
     if (createTrackDto.artistId) {
       const artist = await this.artistsService.findOne(createTrackDto.artistId);
 
-      if (!artist) throw new Error(MESSAGES.ARTIST_NOT_FOUND);
+      if (!artist) throw new BadRequestException(MESSAGES.ARTIST_NOT_FOUND);
     }
 
     if (createTrackDto.albumId) {
       const albumId = await this.albumsService.findOne(createTrackDto.albumId);
 
-      if (!albumId) throw new Error(MESSAGES.ALBUM_NOT_FOUND);
+      if (!albumId) throw new BadRequestException(MESSAGES.ALBUM_NOT_FOUND);
     }
 
-    const newTrack = {
-      ...createTrackDto,
-      id: v4(),
-    };
+    const newTrack = await this.tracksRepository.create(createTrackDto);
 
-    this.tracks.push(newTrack);
-
-    return newTrack;
+    return this.tracksRepository.save(newTrack);
   }
 
-  async remove(id: string): Promise<Track | null> {
-    const idx = this.tracks.findIndex((track) => track.id === id);
-    if (idx === -1) return null;
+  async remove(id: string): Promise<void> {
+    const removedTrack = await this.tracksRepository.delete(id);
+
+    if (!removedTrack.affected) {
+      throw new NotFoundException(MESSAGES.TRACK_NOT_FOUND);
+    }
 
     try {
       await this.favoritesService.removeTrack(id);
-    } catch (error) {
-    } finally {
-      const [removedTrack] = this.tracks.splice(idx, 1);
-
-      return removedTrack;
-    }
+    } catch (error) { }
   }
 
-  async update(
-    id: string,
-    updateTrackDto: UpdateTrackDto,
-  ): Promise<Track | null> {
-    const idx = this.tracks.findIndex((track) => track.id === id);
-    if (idx === -1) return null;
+  async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
+    const track = await this.tracksRepository.findOne({ where: { id } });
+
+    if (!track) throw new NotFoundException(MESSAGES.TRACK_NOT_FOUND);
 
     if (updateTrackDto.artistId) {
       const artist = await this.artistsService.findOne(updateTrackDto.artistId);
 
-      if (!artist) throw new Error(MESSAGES.ARTIST_NOT_FOUND);
+      if (!artist) throw new BadRequestException(MESSAGES.ARTIST_NOT_FOUND);
     }
 
     if (updateTrackDto.albumId) {
       const albumId = await this.albumsService.findOne(updateTrackDto.albumId);
 
-      if (!albumId) throw new Error(MESSAGES.ALBUM_NOT_FOUND);
+      if (!albumId) throw new BadRequestException(MESSAGES.ALBUM_NOT_FOUND);
     }
 
-    this.tracks[idx] = {
-      ...this.tracks[idx],
+    const updatedTrack = {
+      ...track,
       ...updateTrackDto,
     };
 
-    return this.tracks[idx];
+    return this.tracksRepository.save(updatedTrack);
   }
 }
