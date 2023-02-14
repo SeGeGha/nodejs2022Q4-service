@@ -7,6 +7,8 @@ import { AlbumsModule } from './albums/albums.module';
 import { TracksModule } from './tracks/tracks.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { User } from './users/entities/user.entity';
+import { Artist } from './artists/entities/artist.entity';
+import { Album } from './albums/entities/album.entity';
 
 @Module({
   imports: [
@@ -23,7 +25,7 @@ import { User } from './users/entities/user.entity';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [User],
+      entities: [User, Artist, Album],
       autoLoadEntities: true,
       synchronize: true,
     }),
