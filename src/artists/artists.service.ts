@@ -1,5 +1,6 @@
-import { v4 } from 'uuid';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { In, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
@@ -9,15 +10,19 @@ import { TracksService } from '../tracks/tracks.service';
 import { FavoritesService } from '../favorites/favorites.service';
 import { Track } from '../tracks/entities/track.entity';
 import { Album } from '../albums/entities/album.entity';
+import { MESSAGES } from '../constants';
 
 @Injectable()
 export class ArtistsService implements OnModuleInit {
   private albumsService: AlbumsService;
   private tracksService: TracksService;
   private favoritesService: FavoritesService;
-  private artists: Artist[] = [];
 
-  constructor(private moduleRef: ModuleRef) {}
+  constructor(
+    @InjectRepository(Artist)
+    private artistsRepository: Repository<Artist>,
+    private moduleRef: ModuleRef,
+  ) { }
 
   onModuleInit() {
     this.albumsService = this.moduleRef.get(AlbumsService, { strict: false });
@@ -28,31 +33,33 @@ export class ArtistsService implements OnModuleInit {
   }
 
   async findAll(): Promise<Artist[]> {
-    return this.artists;
+    return this.artistsRepository.find();
   }
 
   async findManyByIds(ids: string[]): Promise<Artist[]> {
-    return this.artists.filter((artist) => ids.includes(artist.id));
+    return this.artistsRepository.findBy({ id: In(ids) });
   }
 
-  async findOne(id: string): Promise<Artist | null> {
-    return this.artists.find((artist) => artist.id === id) ?? null;
+  async findOne(id: string): Promise<Artist> {
+    const artist = await this.artistsRepository.findOne({ where: { id } });
+
+    if (artist) return artist;
+
+    throw new NotFoundException(MESSAGES.ARTIST_NOT_FOUND);
   }
 
   async create(createArtistDto: CreateArtistDto): Promise<Artist> {
-    const newArtist = {
-      ...createArtistDto,
-      id: v4(),
-    };
+    const createdArtist = await this.artistsRepository.create(createArtistDto);
 
-    this.artists.push(newArtist);
-
-    return newArtist;
+    return this.artistsRepository.save(createdArtist);
   }
 
-  async remove(id: string): Promise<Artist | null> {
-    const idx = this.artists.findIndex((user) => user.id === id);
-    if (idx === -1) return null;
+  async remove(id: string): Promise<void> {
+    const artist = await this.artistsRepository.delete(id);
+
+    if (!artist.affected) {
+      throw new NotFoundException(MESSAGES.ARTIST_NOT_FOUND);
+    }
 
     try {
       const tracks = await this.tracksService.findAll();
@@ -79,26 +86,19 @@ export class ArtistsService implements OnModuleInit {
       );
 
       await this.favoritesService.removeArtist(id);
-    } catch (error) {
-    } finally {
-      const [removedUser] = this.artists.splice(idx, 1);
-
-      return removedUser;
-    }
+    } catch (error) { }
   }
 
-  async update(
-    id: string,
-    updateArtistDto: UpdateArtistDto,
-  ): Promise<Artist | null> {
-    const idx = this.artists.findIndex((artist) => artist.id === id);
-    if (idx === -1) return null;
+  async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
+    const artist = await this.artistsRepository.findOne({ where: { id } });
 
-    this.artists[idx] = {
-      ...this.artists[idx],
+    if (!artist) throw new NotFoundException(MESSAGES.ARTIST_NOT_FOUND);
+
+    const updatedArtist = {
+      ...artist,
       ...updateArtistDto,
     };
 
-    return this.artists[idx];
+    return this.artistsRepository.save(updatedArtist);
   }
 }

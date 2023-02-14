@@ -12,7 +12,7 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column({ update: false })
+  @Column()
   readonly login: string;
 
   @Column()
@@ -21,10 +21,10 @@ export class User {
   @VersionColumn({ default: 1 })
   version: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   toResponse(): UserResponse {

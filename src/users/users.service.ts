@@ -34,9 +34,7 @@ export class UsersService {
   async create(userDto: CreateUserDto): Promise<UserResponse> {
     const createdUser = this.usersRepository.create(userDto);
 
-    await this.usersRepository.save(createdUser);
-
-    return createdUser.toResponse();
+    return (await this.usersRepository.save(createdUser)).toResponse();
   }
 
   async remove(id: string): Promise<void> {
@@ -61,8 +59,6 @@ export class UsersService {
 
     user.password = userDto.newPassword;
 
-    await this.usersRepository.save(user);
-
-    return user.toResponse();
+    return (await this.usersRepository.save(user)).toResponse();
   }
 }
