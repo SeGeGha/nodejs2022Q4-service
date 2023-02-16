@@ -1,4 +1,3 @@
-import { Album } from 'src/albums/entities/album.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -7,6 +6,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Artist } from '../../artists/entities/artist.entity';
+import { Album } from '../../albums/entities/album.entity';
+import { Favorite } from '../../favorites/entities/favorite.entity';
 
 @Entity('track')
 export class Track {
@@ -36,4 +37,7 @@ export class Track {
   })
   @JoinColumn({ name: 'album_id' })
   album: Album;
+
+  @ManyToOne(() => Favorite, (favorite) => favorite.albums)
+  favorite: Favorite;
 }

@@ -12,14 +12,12 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
 import { ArtistsService } from '../artists/artists.service';
 import { AlbumsService } from '../albums/albums.service';
-import { FavoritesService } from '../favorites/favorites.service';
 import { MESSAGES } from '../constants';
 
 @Injectable()
 export class TracksService implements OnModuleInit {
   private albumsService: AlbumsService;
   private artistsService: ArtistsService;
-  private favoritesService: FavoritesService;
 
   constructor(
     @InjectRepository(Track)
@@ -30,9 +28,6 @@ export class TracksService implements OnModuleInit {
   onModuleInit() {
     this.albumsService = this.moduleRef.get(AlbumsService, { strict: false });
     this.artistsService = this.moduleRef.get(ArtistsService, { strict: false });
-    this.favoritesService = this.moduleRef.get(FavoritesService, {
-      strict: false,
-    });
   }
 
   async findAll(): Promise<Track[]> {
@@ -75,10 +70,6 @@ export class TracksService implements OnModuleInit {
     if (!removedTrack.affected) {
       throw new NotFoundException(MESSAGES.TRACK_NOT_FOUND);
     }
-
-    try {
-      await this.favoritesService.removeTrack(id);
-    } catch (error) { }
   }
 
   async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {

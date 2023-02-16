@@ -1,28 +1,17 @@
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
-import { FavoritesService } from '../favorites/favorites.service';
 import { MESSAGES } from '../constants';
 
 @Injectable()
-export class ArtistsService implements OnModuleInit {
-  private favoritesService: FavoritesService;
-
+export class ArtistsService {
   constructor(
     @InjectRepository(Artist)
     private artistsRepository: Repository<Artist>,
-    private moduleRef: ModuleRef,
   ) { }
-
-  onModuleInit() {
-    this.favoritesService = this.moduleRef.get(FavoritesService, {
-      strict: false,
-    });
-  }
 
   async findAll(): Promise<Artist[]> {
     return this.artistsRepository.find();
@@ -52,10 +41,6 @@ export class ArtistsService implements OnModuleInit {
     if (!artist.affected) {
       throw new NotFoundException(MESSAGES.ARTIST_NOT_FOUND);
     }
-
-    try {
-      await this.favoritesService.removeArtist(id);
-    } catch (error) { }
   }
 
   async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
