@@ -1,4 +1,4 @@
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -15,10 +15,6 @@ export class ArtistsService {
 
   async findAll(): Promise<Artist[]> {
     return this.artistsRepository.find();
-  }
-
-  async findManyByIds(ids: string[]): Promise<Artist[]> {
-    return this.artistsRepository.findBy({ id: In(ids) });
   }
 
   async findOne(id: string): Promise<Artist> {

@@ -1,41 +1,30 @@
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  OnModuleInit,
 } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
-import { ArtistsService } from '../artists/artists.service';
-import { AlbumsService } from '../albums/albums.service';
+import { Album } from '../albums/entities/album.entity';
+import { Artist } from '../artists/entities/artist.entity';
 import { MESSAGES } from '../constants';
 
 @Injectable()
-export class TracksService implements OnModuleInit {
-  private albumsService: AlbumsService;
-  private artistsService: ArtistsService;
-
+export class TracksService {
   constructor(
     @InjectRepository(Track)
     private tracksRepository: Repository<Track>,
-    private moduleRef: ModuleRef,
+    @InjectRepository(Album)
+    private albumsRepository: Repository<Album>,
+    @InjectRepository(Artist)
+    private artistsRepository: Repository<Artist>,
   ) { }
-
-  onModuleInit() {
-    this.albumsService = this.moduleRef.get(AlbumsService, { strict: false });
-    this.artistsService = this.moduleRef.get(ArtistsService, { strict: false });
-  }
 
   async findAll(): Promise<Track[]> {
     return this.tracksRepository.find();
-  }
-
-  async findManyByIds(ids: string[]): Promise<Track[]> {
-    return this.tracksRepository.findBy({ id: In(ids) });
   }
 
   async findOne(id: string): Promise<Track | null> {
@@ -47,17 +36,10 @@ export class TracksService implements OnModuleInit {
   }
 
   async create(createTrackDto: CreateTrackDto): Promise<Track> {
-    if (createTrackDto.artistId) {
-      const artist = await this.artistsService.findOne(createTrackDto.artistId);
+    const { artistId, albumId } = createTrackDto;
 
-      if (!artist) throw new BadRequestException(MESSAGES.ARTIST_NOT_FOUND);
-    }
-
-    if (createTrackDto.albumId) {
-      const albumId = await this.albumsService.findOne(createTrackDto.albumId);
-
-      if (!albumId) throw new BadRequestException(MESSAGES.ALBUM_NOT_FOUND);
-    }
+    if (artistId) await this.isArtistExists(artistId);
+    if (albumId) await this.isAlbumExists(albumId);
 
     const newTrack = await this.tracksRepository.create(createTrackDto);
 
@@ -77,17 +59,10 @@ export class TracksService implements OnModuleInit {
 
     if (!track) throw new NotFoundException(MESSAGES.TRACK_NOT_FOUND);
 
-    if (updateTrackDto.artistId) {
-      const artist = await this.artistsService.findOne(updateTrackDto.artistId);
+    const { artistId, albumId } = updateTrackDto;
 
-      if (!artist) throw new BadRequestException(MESSAGES.ARTIST_NOT_FOUND);
-    }
-
-    if (updateTrackDto.albumId) {
-      const albumId = await this.albumsService.findOne(updateTrackDto.albumId);
-
-      if (!albumId) throw new BadRequestException(MESSAGES.ALBUM_NOT_FOUND);
-    }
+    if (artistId) await this.isArtistExists(artistId);
+    if (albumId) await this.isAlbumExists(albumId);
 
     const updatedTrack = {
       ...track,
@@ -95,5 +70,21 @@ export class TracksService implements OnModuleInit {
     };
 
     return this.tracksRepository.save(updatedTrack);
+  }
+
+  private async isAlbumExists(id: string) {
+    try {
+      return await this.albumsRepository.findOneOrFail({ where: { id } });
+    } catch (error) {
+      throw new BadRequestException(MESSAGES.ALBUM_NOT_FOUND);
+    }
+  }
+
+  private async isArtistExists(id: string) {
+    try {
+      return await this.artistsRepository.findOneOrFail({ where: { id } });
+    } catch (error) {
+      throw new BadRequestException(MESSAGES.ARTIST_NOT_FOUND);
+    }
   }
 }
