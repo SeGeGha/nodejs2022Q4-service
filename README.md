@@ -4,6 +4,7 @@
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker - [Download & Install Docker](https://docs.docker.com/engine/install/)
 
 ## Downloading
 
@@ -14,7 +15,7 @@ git clone https://github.com/SeGeGha/nodejs2022Q4-service
 ## Installing NPM modules
 
 ```
-git checkout feat/create-rest-service
+git checkout feat/docker
 ```
 
 ```
@@ -23,7 +24,7 @@ npm install
 
 ## Running application
 
-Rename .env.example to .env. You can set PORT (default 4000). For Swagger UI need set `SWAGGER_YAML_PATH = ../doc/api.yaml` (specified by default)
+Rename .env.example to .env. You can set PORT (default 4000). For Swagger UI need set `SWAGGER_YAML_PATH = doc/api.yaml` (specified by default)
 
 ```
 npm start:dev
