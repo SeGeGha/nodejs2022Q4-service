@@ -1,41 +1,30 @@
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  OnModuleInit,
 } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
-import { ArtistsService } from '../artists/artists.service';
+import { Artist } from '../artists/entities/artist.entity';
 import { MESSAGES } from '../constants';
 
 @Injectable()
-export class AlbumsService implements OnModuleInit {
-  private artistsService: ArtistsService;
-
+export class AlbumsService {
   constructor(
     @InjectRepository(Album)
     private albumsRepository: Repository<Album>,
-    private moduleRef: ModuleRef,
+    @InjectRepository(Artist)
+    private artistsRepository: Repository<Artist>,
   ) { }
-
-  onModuleInit() {
-    this.artistsService = this.moduleRef.get(ArtistsService, { strict: false });
-  }
 
   async findAll(): Promise<Album[]> {
     return this.albumsRepository.find();
   }
 
-  async findManyByIds(ids: string[]): Promise<Album[]> {
-    return this.albumsRepository.findBy({ id: In(ids) });
-  }
-
-  async findOne(id: string): Promise<Album | null> {
+  async findOne(id: string): Promise<Album> {
     const album = await this.albumsRepository.findOne({ where: { id } });
 
     if (album) return album;
@@ -44,13 +33,9 @@ export class AlbumsService implements OnModuleInit {
   }
 
   async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
-    if (createAlbumDto.artistId) {
-      try {
-        await this.artistsService.findOne(createAlbumDto.artistId);
-      } catch (error) {
-        throw new BadRequestException(error.message);
-      }
-    }
+    const { artistId } = createAlbumDto;
+
+    if (artistId) await this.isArtistExists(artistId);
 
     const createdAlbum = await this.albumsRepository.create(createAlbumDto);
 
@@ -67,16 +52,11 @@ export class AlbumsService implements OnModuleInit {
 
   async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
     const album = await this.albumsRepository.findOne({ where: { id } });
+    const { artistId } = updateAlbumDto;
 
     if (!album) throw new NotFoundException(MESSAGES.ALBUM_NOT_FOUND);
 
-    if (updateAlbumDto.artistId) {
-      try {
-        await this.artistsService.findOne(updateAlbumDto.artistId);
-      } catch (error) {
-        throw new BadRequestException(error.message);
-      }
-    }
+    if (artistId) await this.isArtistExists(artistId);
 
     const updatedAlbum = {
       ...album,
@@ -84,5 +64,13 @@ export class AlbumsService implements OnModuleInit {
     };
 
     return this.albumsRepository.save(updatedAlbum);
+  }
+
+  private async isArtistExists(id: string) {
+    try {
+      return await this.artistsRepository.findOneOrFail({ where: { id } });
+    } catch {
+      throw new BadRequestException(MESSAGES.ARTIST_NOT_FOUND);
+    }
   }
 }
