@@ -8,10 +8,14 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/SeGeGha/nodejs2022Q4-service
 ```
 
 ## Installing NPM modules
+
+```
+git checkout feat/create-rest-service
+```
 
 ```
 npm install
@@ -19,13 +23,20 @@ npm install
 
 ## Running application
 
+Rename .env.example to .env. You can set PORT (default 4000). For Swagger UI need set `SWAGGER_YAML_PATH = ../doc/api.yaml` (specified by default)
+
+```
+npm start:dev
+```
+
+or
+
 ```
 npm start
 ```
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Testing
 
@@ -43,18 +54,6 @@ To run only one of all test suites
 npm run test -- <path to suite>
 ```
 
-To run all test with authorization
-
-```
-npm run test:auth
-```
-
-To run only specific test suite with authorization
-
-```
-npm run test:auth -- <path to suite>
-```
-
 ### Auto-fix and format
 
 ```
@@ -65,8 +64,8 @@ npm run lint
 npm run format
 ```
 
-### Debugging in VSCode
+### Moments of the application
 
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+- unnecessary DTO fields are truncated and not included in the database models
+- successfull POST `favs/*/id` response contains `artists: string[], albums: string[], tracks: string[]`
+- if the artist (album, track) has already been added to favorites, the second addition will be ignored
