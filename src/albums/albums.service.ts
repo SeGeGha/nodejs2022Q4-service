@@ -37,7 +37,7 @@ export class AlbumsService {
 
     if (artistId) await this.isArtistExists(artistId);
 
-    const createdAlbum = await this.albumsRepository.create(createAlbumDto);
+    const createdAlbum = this.albumsRepository.create(createAlbumDto);
 
     return this.albumsRepository.save(createdAlbum);
   }

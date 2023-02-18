@@ -28,17 +28,12 @@ export class FavoritesService {
   ) { }
 
   async findAll(): Promise<FavoriteResponse> {
-    const [favorite] = await this.favoritesRepository.find({
-      relations: ['artists', 'albums', 'tracks'],
-    });
+    const favorite = await this.getFavorite();
 
-    return favorite ?? { artists: [], albums: [], tracks: [] };
+    return favorite.toResponse();
   }
 
-  async add(
-    entityType: Entity,
-    id: string,
-  ): Promise<Partial<FavoriteResponse>> {
+  async add(entityType: Entity, id: string): Promise<FavoriteResponse> {
     const repository: RepositoryRef = this[`${entityType}Repository`];
     const entity = await repository.findOne({ where: { id } });
 
@@ -48,28 +43,20 @@ export class FavoritesService {
       );
     }
 
-    const [
-      favorite = {
-        [entityType]: [],
-      },
-    ] = await this.favoritesRepository.find({ relations: [entityType] });
+    const favorite = await this.getFavorite();
     const idx = favorite[entityType].findIndex((entity) => entity.id === id);
 
     if (idx === -1) {
-      favorite[entityType].push(entity);
+      favorite[entityType as string].push(entity);
 
       await this.favoritesRepository.save(favorite);
     }
 
-    return favorite;
+    return favorite.toResponse();
   }
 
   async remove(entityType: Entity, id: string): Promise<void> {
-    const [
-      favorite = {
-        [entityType]: [],
-      },
-    ] = await this.favoritesRepository.find({ relations: [entityType] });
+    const favorite = await this.getFavorite();
     const idx = favorite[entityType].findIndex((entity) => entity.id === id);
 
     if (idx >= 0) {
@@ -81,5 +68,23 @@ export class FavoritesService {
         MESSAGES[`${entityType.slice(0, -1).toUpperCase()}_NOT_FOUND`],
       );
     }
+  }
+
+  private async getFavorite(): Promise<Favorite> {
+    let [favorite] = await this.favoritesRepository.find({
+      relations: [ENTITIES.ARTISTS, ENTITIES.ALBUMS, ENTITIES.TRACKS],
+    });
+
+    if (!favorite) {
+      favorite = this.favoritesRepository.create({
+        artists: [],
+        albums: [],
+        tracks: [],
+      });
+
+      await this.favoritesRepository.save(favorite);
+    }
+
+    return favorite;
   }
 }

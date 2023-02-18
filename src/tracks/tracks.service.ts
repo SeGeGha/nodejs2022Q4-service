@@ -41,7 +41,7 @@ export class TracksService {
     if (artistId) await this.isArtistExists(artistId);
     if (albumId) await this.isAlbumExists(albumId);
 
-    const newTrack = await this.tracksRepository.create(createTrackDto);
+    const newTrack = this.tracksRepository.create(createTrackDto);
 
     return this.tracksRepository.save(newTrack);
   }

@@ -20,6 +20,12 @@ export class Favorite {
   @OneToMany(() => Track, (track) => track.favorite)
   @JoinColumn()
   tracks: Track[];
+
+  toResponse() {
+    const { artists, albums, tracks } = this;
+
+    return { artists, albums, tracks };
+  }
 }
 
-export type FavoriteResponse = Omit<Favorite, 'id'>;
+export type FavoriteResponse = Omit<Favorite, 'id' | 'toResponse'>;
