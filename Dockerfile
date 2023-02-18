@@ -1,11 +1,11 @@
-FROM node:18-alpine
+FROM node:18.14-alpine
 
 WORKDIR /app
 
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm install cache clean --force 
+RUN npm install 
 
 COPY . .
 
