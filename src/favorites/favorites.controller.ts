@@ -24,21 +24,21 @@ export class FavoritesController {
   @Post('artist/:id')
   async addArtist(
     @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<Partial<FavoriteResponse>> {
+  ): Promise<FavoriteResponse> {
     return this.favoritesService.add(ENTITIES.ARTISTS, id);
   }
 
   @Post('album/:id')
   async addAlbum(
     @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<Partial<FavoriteResponse>> {
+  ): Promise<FavoriteResponse> {
     return this.favoritesService.add(ENTITIES.ALBUMS, id);
   }
 
   @Post('track/:id')
   async addTrack(
     @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<Partial<FavoriteResponse>> {
+  ): Promise<FavoriteResponse> {
     return this.favoritesService.add(ENTITIES.TRACKS, id);
   }
 
