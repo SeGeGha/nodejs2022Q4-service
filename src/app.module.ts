@@ -5,6 +5,7 @@ import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
 import { TracksModule } from './tracks/tracks.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { AuthModule } from './auth/auth.module';
 import { dataSourceOptions } from '../db/data-source';
 
 @Module({
@@ -14,6 +15,7 @@ import { dataSourceOptions } from '../db/data-source';
     AlbumsModule,
     TracksModule,
     FavoritesModule,
+    AuthModule,
     TypeOrmModule.forRoot(dataSourceOptions),
   ],
 })
