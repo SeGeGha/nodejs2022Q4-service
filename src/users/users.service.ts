@@ -31,6 +31,14 @@ export class UsersService {
     throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
   }
 
+  async findByLogin(login: string): Promise<User | null> {
+    const user = await this.usersRepository.findOne({
+      where: { login },
+    });
+
+    return user ?? null;
+  }
+
   async create(userDto: CreateUserDto): Promise<UserResponse> {
     const createdUser = this.usersRepository.create(userDto);
 

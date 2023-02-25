@@ -5,8 +5,9 @@ export const MESSAGES = {
   ARTIST_NOT_FOUND: 'Artist not found',
   ALBUM_NOT_FOUND: 'Album not found',
   TRACK_NOT_FOUND: 'Track not found',
-  WRONG_PASSWORD: 'Wrong old password',
+  WRONG_PASSWORD: 'Wrong password',
   SAME_PASSWORDS: 'Same passwords',
+  SUCCESS_USER_SIGNUP: 'User successfully registered',
 };
 
 export enum ENTITIES {
