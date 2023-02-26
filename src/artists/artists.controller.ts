@@ -6,7 +6,6 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
-  NotFoundException,
   Put,
   HttpCode,
   HttpStatus,
@@ -15,11 +14,10 @@ import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
-import { MESSAGES } from '../constants';
 
 @Controller('artist')
 export class ArtistsController {
-  constructor(private readonly artistsService: ArtistsService) {}
+  constructor(private readonly artistsService: ArtistsService) { }
 
   @Get()
   async findAll(): Promise<Artist[]> {
@@ -28,13 +26,7 @@ export class ArtistsController {
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<Artist> {
-    const artist = await this.artistsService.findOne(id);
-
-    if (artist) {
-      return artist;
-    } else {
-      throw new NotFoundException(MESSAGES.ARTIST_NOT_FOUND);
-    }
+    return await this.artistsService.findOne(id);
   }
 
   @Post()
@@ -45,11 +37,7 @@ export class ArtistsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
-    const removedArtist = await this.artistsService.remove(id);
-
-    if (!removedArtist) {
-      throw new NotFoundException(MESSAGES.ARTIST_NOT_FOUND);
-    }
+    return this.artistsService.remove(id);
   }
 
   @Put(':id')
@@ -57,12 +45,6 @@ export class ArtistsController {
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ): Promise<Artist> {
-    const updatedArtist = await this.artistsService.update(id, updateArtistDto);
-
-    if (updatedArtist) {
-      return updatedArtist;
-    } else {
-      throw new NotFoundException(MESSAGES.ARTIST_NOT_FOUND);
-    }
+    return this.artistsService.update(id, updateArtistDto);
   }
 }

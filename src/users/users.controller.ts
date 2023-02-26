@@ -6,19 +6,16 @@ import {
   Get,
   Delete,
   Put,
-  NotFoundException,
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
-  ForbiddenException,
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
-import { MESSAGES } from '../constants';
+import { UserResponse } from './entities/user.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('user')
@@ -26,57 +23,31 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get()
-  async findAll(): Promise<User[]> {
-    const userEntities = await this.usersService.findAll();
-
-    return userEntities.map((userEntity) => new User(userEntity));
+  async findAll(): Promise<UserResponse[]> {
+    return this.usersService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id', new ParseUUIDPipe()) id): Promise<User> {
-    const userEntity = await this.usersService.findOne(id);
-
-    if (userEntity) {
-      return new User(userEntity);
-    } else {
-      throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
-    }
+  async findOne(@Param('id', new ParseUUIDPipe()) id): Promise<UserResponse> {
+    return this.usersService.findOne(id);
   }
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const userEntity = await this.usersService.create(createUserDto);
-
-    return new User(userEntity);
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserResponse> {
+    return this.usersService.create(createUserDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
-    const removedUserEntity = await this.usersService.remove(id);
-
-    if (!removedUserEntity) {
-      throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
-    }
+    return this.usersService.remove(id);
   }
 
   @Put(':id')
   async update(
     @Body() updateUserDto: UpdateUserDto,
     @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<User> {
-    let updatedUserEntity;
-
-    try {
-      updatedUserEntity = await this.usersService.update(id, updateUserDto);
-    } catch (error) {
-      throw new ForbiddenException(error.message);
-    }
-
-    if (updatedUserEntity) {
-      return new User(updatedUserEntity);
-    } else {
-      throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
-    }
+  ): Promise<UserResponse> {
+    return this.usersService.update(id, updateUserDto);
   }
 }
