@@ -27,4 +27,4 @@ import { dataSourceOptions } from '../db/data-source';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
