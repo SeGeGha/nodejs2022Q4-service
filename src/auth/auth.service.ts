@@ -1,10 +1,10 @@
 import { ModuleRef } from '@nestjs/core';
 import { ForbiddenException, Injectable, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Tokens } from './types/tokens';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { Tokens } from './types/tokens';
-import { BaseResponse } from './types/base-response';
+import { User, UserResponse } from '../users/entities/user.entity';
 import { MESSAGES } from '../constants';
 
 @Injectable()
@@ -17,15 +17,18 @@ export class AuthService implements OnModuleInit {
     this.usersService = this.moduleRef.get(UsersService, { strict: false });
   }
 
-  async register(userDto: CreateUserDto): Promise<BaseResponse> {
-    await this.usersService.create(userDto);
-
-    return {
-      message: MESSAGES.SUCCESS_USER_SIGNUP,
-    };
+  async register(userDto: CreateUserDto): Promise<UserResponse> {
+    return this.usersService.create(userDto);
   }
 
   async login(userDto: CreateUserDto): Promise<Tokens> {
+    const user = await this.validateUser(userDto);
+    const tokens = await this.generateTokens(user);
+
+    return tokens;
+  }
+
+  private async validateUser(userDto: CreateUserDto): Promise<User> {
     const user = await this.usersService.findByLogin(userDto.login);
 
     if (!user) throw new ForbiddenException(MESSAGES.USER_NOT_FOUND);
@@ -39,16 +42,14 @@ export class AuthService implements OnModuleInit {
       throw new ForbiddenException(MESSAGES.WRONG_PASSWORD);
     }
 
-    const tokens = await this.generateTokens(user.id, user.login);
-    // await this.updateRefreshHash(data.id, tokens.refreshToken);
-    return tokens;
+    return user;
   }
 
-  private async generateTokens(userId: string, login: string): Promise<Tokens> {
+  private async generateTokens({ id, login }: User): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          userId,
+          id,
           login,
         },
         {
@@ -58,7 +59,7 @@ export class AuthService implements OnModuleInit {
       ),
       this.jwtService.signAsync(
         {
-          userId,
+          id,
           login,
         },
         {

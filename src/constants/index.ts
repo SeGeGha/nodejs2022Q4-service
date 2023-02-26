@@ -1,4 +1,6 @@
 export const DEFAULT_PORT = 4000;
+export const BEARER = 'Bearer';
+export const IS_PUBLIC_KEY = 'isPublic';
 
 export const MESSAGES = {
   USER_NOT_FOUND: 'User not found',
@@ -8,6 +10,8 @@ export const MESSAGES = {
   WRONG_PASSWORD: 'Wrong password',
   SAME_PASSWORDS: 'Same passwords',
   SUCCESS_USER_SIGNUP: 'User successfully registered',
+  AUTH_HEADER_EXCEPTION: 'Authorisation Header Error',
+  UNAUTHORIZED_USER: 'User is not authorized',
 };
 
 export enum ENTITIES {
