@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -8,6 +9,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserResponse } from './entities/user.entity';
+import { hash } from '../utils/hash';
 import { MESSAGES } from '../constants';
 
 @Injectable()
@@ -40,7 +42,11 @@ export class UsersService {
   }
 
   async create(userDto: CreateUserDto): Promise<UserResponse> {
-    const createdUser = this.usersRepository.create(userDto);
+    const hashPassword = await this.hashPassword(userDto.password);
+    const createdUser = this.usersRepository.create({
+      ...userDto,
+      password: hashPassword,
+    });
 
     return (await this.usersRepository.save(createdUser)).toResponse();
   }
@@ -61,12 +67,27 @@ export class UsersService {
     if (userDto.newPassword === userDto.oldPassword) {
       throw new ForbiddenException(MESSAGES.SAME_PASSWORDS);
     }
-    if (user.password !== userDto.oldPassword) {
-      throw new ForbiddenException(MESSAGES.WRONG_PASSWORD);
-    }
 
-    user.password = userDto.newPassword;
+    const passwordMatch = await this.isPasswordsEquals(
+      userDto.oldPassword,
+      user.password,
+    );
+
+    if (!passwordMatch) throw new ForbiddenException(MESSAGES.WRONG_PASSWORD);
+
+    user.password = await this.hashPassword(userDto.newPassword);
 
     return (await this.usersRepository.save(user)).toResponse();
+  }
+
+  async isPasswordsEquals(
+    password: string,
+    passwordHash: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, passwordHash);
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    return hash(password, Number(process.env.CRYPT_SALT));
   }
 }
