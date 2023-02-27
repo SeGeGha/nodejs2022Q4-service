@@ -46,9 +46,6 @@ If docker doesn't build images try adding current directory to docker resources 
 
 Migrations will be automatically applied from `src/migrations` after starting the application (.env -> TYPEORM_MIGRATIONS_RUN=true). 
 
-For work with migrations use console in server container:
- ![image](https://user-images.githubusercontent.com/21230284/219878721-cebb8d19-db34-477b-9e71-b6a65e2ea233.png)
-
 Generate migrations:
  - delete src/migrations; 
  - use migration:generate script

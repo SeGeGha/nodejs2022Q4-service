@@ -27,9 +27,9 @@
     "scan:service": "docker scan nest-service",
     "scan:postgres": "docker scan postgres",
     "typeorm": "npm run build && npx typeorm -d ./dist/db/data-source.js",
-    "migration:generate": "npm run typeorm migration:generate ./src/migrations/initMigrations",
-    "migration:run": "npm run typeorm migration:run",
-    "migration:revert": "npm run typeorm migration:revert"
+    "migration:generate": "docker exec server npm run typeorm migration:generate ./src/migrations/initMigrations",
+    "migration:run": "docker exec server npm run typeorm migration:run",
+    "migration:revert": "docker exec server npm run typeorm migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
