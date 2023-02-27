@@ -21,7 +21,7 @@ export class TracksService {
     private albumsRepository: Repository<Album>,
     @InjectRepository(Artist)
     private artistsRepository: Repository<Artist>,
-  ) { }
+  ) {}
 
   async findAll(): Promise<Track[]> {
     return this.tracksRepository.find();

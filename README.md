@@ -15,7 +15,7 @@ git clone https://github.com/SeGeGha/nodejs2022Q4-service
 ## Installing NPM modules
 
 ```
-git checkout feat/postgres-and-docker
+git checkout feat/authentication-and-authorization
 ```
 
 ```
@@ -26,21 +26,6 @@ npm install
 
 Rename .env.example to .env. You can set PORT (default 4000). For Swagger UI need set `SWAGGER_YAML_PATH = doc/api.yaml` (specified by default)
 
-```
-npm start:dev
-```
-
-or
-
-```
-npm start
-```
-
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-
-## Docker
-
 Build services
 ```
 npm run docker:build
@@ -49,15 +34,10 @@ Start containers
 ```
 npm run docker:up
 ```
-Run tests in containers
-```
-npm run docker:test
-```
-Scan docker images
-```
-npm run scan:service
-npm run scan:postgres
-```
+
+After starting the app on port (4000 as default) you can open
+in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
+
 If docker doesn't build images try adding current directory to docker resources as in image
 
 ![image](https://user-images.githubusercontent.com/21230284/218312899-e039c4ac-0777-46da-9ac4-46829c26341b.png)
@@ -65,9 +45,6 @@ If docker doesn't build images try adding current directory to docker resources 
 ## Migrations
 
 Migrations will be automatically applied from `src/migrations` after starting the application (.env -> TYPEORM_MIGRATIONS_RUN=true). 
-
-For work with migrations use console in server container:
- ![image](https://user-images.githubusercontent.com/21230284/219878721-cebb8d19-db34-477b-9e71-b6a65e2ea233.png)
 
 Generate migrations:
  - delete src/migrations; 
@@ -95,11 +72,25 @@ To run all tests without authorization
 ```
 npm run test
 ```
+or
+```
+npm run docker:test
+```
 
 To run only one of all test suites
 
 ```
 npm run test -- <path to suite>
+```
+
+To run all test with authorization
+
+```
+npm run test:auth
+```
+or
+```
+npm run docker:test:auth
 ```
 
 ### Auto-fix and format

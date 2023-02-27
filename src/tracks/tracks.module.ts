@@ -11,4 +11,4 @@ import { Album } from '../albums/entities/album.entity';
   controllers: [TracksController],
   providers: [TracksService],
 })
-export class TracksModule { }
+export class TracksModule {}

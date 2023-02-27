@@ -17,7 +17,7 @@ import { Album } from './entities/album.entity';
 
 @Controller('album')
 export class AlbumsController {
-  constructor(private readonly albumsService: AlbumsService) { }
+  constructor(private readonly albumsService: AlbumsService) {}
 
   @Get()
   async findAll(): Promise<Album[]> {

@@ -10,4 +10,4 @@ import { Artist } from '../artists/entities/artist.entity';
   controllers: [AlbumsController],
   providers: [AlbumsService],
 })
-export class AlbumsModule { }
+export class AlbumsModule {}

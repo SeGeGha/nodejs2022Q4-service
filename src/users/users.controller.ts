@@ -20,7 +20,7 @@ import { UserResponse } from './entities/user.entity';
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('user')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Get()
   async findAll(): Promise<UserResponse[]> {

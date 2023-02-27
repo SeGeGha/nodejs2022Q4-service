@@ -1,6 +1,8 @@
+import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,6 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserResponse } from './entities/user.entity';
+import { hash } from '../utils/hash';
 import { MESSAGES } from '../constants';
 
 @Injectable()
@@ -31,10 +34,28 @@ export class UsersService {
     throw new NotFoundException(MESSAGES.USER_NOT_FOUND);
   }
 
-  async create(userDto: CreateUserDto): Promise<UserResponse> {
-    const createdUser = this.usersRepository.create(userDto);
+  async findByLogin(login: string): Promise<User | null> {
+    const user = await this.usersRepository.findOne({
+      where: { login },
+    });
 
-    return (await this.usersRepository.save(createdUser)).toResponse();
+    return user ?? null;
+  }
+
+  async create(userDto: CreateUserDto): Promise<UserResponse> {
+    const hashPassword = await this.hashPassword(userDto.password);
+    const createdUser = this.usersRepository.create({
+      ...userDto,
+      password: hashPassword,
+    });
+
+    try {
+      const newUser = await this.usersRepository.save(createdUser);
+
+      return newUser.toResponse();
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async remove(id: string): Promise<void> {
@@ -53,12 +74,40 @@ export class UsersService {
     if (userDto.newPassword === userDto.oldPassword) {
       throw new ForbiddenException(MESSAGES.SAME_PASSWORDS);
     }
-    if (user.password !== userDto.oldPassword) {
-      throw new ForbiddenException(MESSAGES.WRONG_PASSWORD);
-    }
 
-    user.password = userDto.newPassword;
+    const passwordMatch = await this.isPasswordsEquals(
+      userDto.oldPassword,
+      user.password,
+    );
+
+    if (!passwordMatch) throw new ForbiddenException(MESSAGES.WRONG_PASSWORD);
+
+    user.password = await this.hashPassword(userDto.newPassword);
 
     return (await this.usersRepository.save(user)).toResponse();
+  }
+
+  async updateRefreshTokenHash(id: string, token: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+
+    if (!user) throw new ForbiddenException(MESSAGES.USER_NOT_FOUND);
+
+    const hashedRefresh = await hash(token, Number(process.env.CRYPT_SALT));
+
+    return await this.usersRepository.save({
+      ...user,
+      hashedRefresh,
+    });
+  }
+
+  async isPasswordsEquals(
+    password: string,
+    passwordHash: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, passwordHash);
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    return hash(password, Number(process.env.CRYPT_SALT));
   }
 }

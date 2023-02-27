@@ -12,4 +12,4 @@ import { Track } from '../tracks/entities/track.entity';
   controllers: [FavoritesController],
   providers: [FavoritesService],
 })
-export class FavoritesModule { }
+export class FavoritesModule {}
