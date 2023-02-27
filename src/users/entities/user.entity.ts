@@ -18,6 +18,9 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ default: '' })
+  hashedRefresh: string;
+
   @VersionColumn({ default: 1 })
   version: number;
 
