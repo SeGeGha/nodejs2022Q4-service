@@ -5,13 +5,21 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { readFile } from 'fs/promises';
 import { AppModule } from './app.module';
 import { DEFAULT_PORT } from './constants';
+import { LoggerService } from './logger/logger.service';
 
 import('reflect-metadata');
 
-const { PORT = DEFAULT_PORT, SWAGGER_YAML_PATH } = process.env;
+const {
+  PORT = DEFAULT_PORT,
+  SWAGGER_YAML_PATH,
+  LOGGER_LEVELS = '',
+} = process.env;
+const LOGGER_LEVELS_LIST = LOGGER_LEVELS.split(',');
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
 
   try {
     const doc = await readFile(SWAGGER_YAML_PATH, {
@@ -22,6 +30,7 @@ async function bootstrap() {
     console.error(error.message);
   }
 
+  app.useLogger(new LoggerService(LOGGER_LEVELS_LIST));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   await app.listen(PORT, () => {

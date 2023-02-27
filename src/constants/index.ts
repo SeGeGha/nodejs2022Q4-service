@@ -23,3 +23,19 @@ export enum ENTITIES {
   TRACKS = 'tracks',
   FAVORITES = 'favorites',
 }
+
+export enum LOGGER_LEVELS {
+  LOG = 'log',
+  DEBUG = 'debug',
+  ERROR = 'error',
+  VERBOSE = 'verbose',
+  WARN = 'warn',
+}
+
+export enum COLORS {
+  WHITE = '\x1b[37m',
+  GREEN = '\x1b[32m',
+  RED = '\x1b[31m',
+  YELLOW = '\x1b[33m',
+  BLUE = '\x1b[34m',
+}
