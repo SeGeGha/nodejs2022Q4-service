@@ -2,22 +2,14 @@ import {
   Injectable,
   LoggerService as CommonLoggerService,
 } from '@nestjs/common';
-import { COLORS, LOGGER_LEVELS } from 'src/constants';
-
-const loggerLevelList = [
-  LOGGER_LEVELS.LOG,
-  LOGGER_LEVELS.DEBUG,
-  LOGGER_LEVELS.ERROR,
-  LOGGER_LEVELS.VERBOSE,
-  LOGGER_LEVELS.WARN,
-];
+import { COLORS, LOGGER_LEVELS, BASE_LOGGER_LEVELS } from 'src/constants';
 
 @Injectable()
 export class LoggerService implements CommonLoggerService {
   private loggerLevels: string[];
 
   constructor(loggerLevel: number) {
-    this.loggerLevels = loggerLevelList.slice(0, loggerLevel);
+    this.loggerLevels = BASE_LOGGER_LEVELS.slice(0, loggerLevel);
   }
 
   log(message: string, ...optionalParams: any[]) {

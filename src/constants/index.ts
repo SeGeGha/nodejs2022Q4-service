@@ -1,6 +1,7 @@
 export const DEFAULT_PORT = 4000;
 export const BEARER = 'Bearer';
 export const IS_PUBLIC_KEY = 'isPublic';
+export const REQUEST = 'REQUEST';
 
 export const MESSAGES = {
   USER_NOT_FOUND: 'User not found',
@@ -31,6 +32,14 @@ export enum LOGGER_LEVELS {
   VERBOSE = 'verbose',
   WARN = 'warn',
 }
+
+export const BASE_LOGGER_LEVELS = [
+  LOGGER_LEVELS.LOG,
+  LOGGER_LEVELS.DEBUG,
+  LOGGER_LEVELS.ERROR,
+  LOGGER_LEVELS.VERBOSE,
+  LOGGER_LEVELS.WARN,
+];
 
 export enum COLORS {
   WHITE = '\x1b[37m',
