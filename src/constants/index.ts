@@ -12,6 +12,8 @@ export const MESSAGES = {
   SUCCESS_USER_SIGNUP: 'User successfully registered',
   AUTH_HEADER_EXCEPTION: 'Authorisation Header Error',
   UNAUTHORIZED_USER: 'User is not authorized',
+  UNCORRECT_REFRESH_TOKEN: 'Refresh token is not correct',
+  ACCEPT_DENIED: 'Access denied',
 };
 
 export enum ENTITIES {

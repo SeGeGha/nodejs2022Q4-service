@@ -11,7 +11,7 @@ import { MESSAGES, BEARER, IS_PUBLIC_KEY } from '../../../constants';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector) {}
+  constructor(private jwtService: JwtService, private reflector: Reflector) { }
 
   canActivate(
     context: ExecutionContext,
@@ -39,6 +39,8 @@ export class JwtAuthGuard implements CanActivate {
       const user = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET_KEY,
       });
+
+      console.log(user);
 
       req.user = user;
 

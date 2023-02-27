@@ -2,6 +2,7 @@ import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -17,7 +18,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async findAll(): Promise<UserResponse[]> {
     const users = await this.usersRepository.find();
@@ -48,7 +49,13 @@ export class UsersService {
       password: hashPassword,
     });
 
-    return (await this.usersRepository.save(createdUser)).toResponse();
+    try {
+      const newUser = await this.usersRepository.save(createdUser);
+
+      return newUser.toResponse();
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async remove(id: string): Promise<void> {
@@ -78,6 +85,19 @@ export class UsersService {
     user.password = await this.hashPassword(userDto.newPassword);
 
     return (await this.usersRepository.save(user)).toResponse();
+  }
+
+  async updateRefreshTokenHash(id: string, token: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+
+    if (!user) throw new ForbiddenException(MESSAGES.USER_NOT_FOUND);
+
+    const hashedRefresh = await hash(token, Number(process.env.CRYPT_SALT));
+
+    return await this.usersRepository.save({
+      ...user,
+      hashedRefresh,
+    });
   }
 
   async isPasswordsEquals(

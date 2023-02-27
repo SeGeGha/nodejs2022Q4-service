@@ -1,5 +1,11 @@
+import * as bcrypt from 'bcryptjs';
 import { ModuleRef } from '@nestjs/core';
-import { ForbiddenException, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  OnModuleInit,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Tokens } from './types/tokens';
 import { UsersService } from '../users/users.service';
@@ -11,7 +17,7 @@ import { MESSAGES } from '../constants';
 export class AuthService implements OnModuleInit {
   private usersService: UsersService;
 
-  constructor(private moduleRef: ModuleRef, private jwtService: JwtService) {}
+  constructor(private moduleRef: ModuleRef, private jwtService: JwtService) { }
 
   onModuleInit() {
     this.usersService = this.moduleRef.get(UsersService, { strict: false });
@@ -23,9 +29,30 @@ export class AuthService implements OnModuleInit {
 
   async login(userDto: CreateUserDto): Promise<Tokens> {
     const user = await this.validateUser(userDto);
-    const tokens = await this.generateTokens(user);
 
-    return tokens;
+    return this.getTokens(user);
+  }
+
+  async refresh(token: string): Promise<Tokens> {
+    try {
+      await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET_REFRESH_KEY,
+      });
+    } catch (error) {
+      throw new UnauthorizedException(MESSAGES.UNCORRECT_REFRESH_TOKEN);
+    }
+
+    const { login } = this.jwtService.decode(token) as Record<string, string>;
+
+    const user = await this.usersService.findByLogin(login);
+
+    if (!user) throw new ForbiddenException(MESSAGES.USER_NOT_FOUND);
+
+    const refreshMatch = await bcrypt.compare(token, user.hashedRefresh);
+
+    if (!refreshMatch) throw new ForbiddenException(MESSAGES.ACCEPT_DENIED);
+
+    return this.getTokens(user);
   }
 
   private async validateUser(userDto: CreateUserDto): Promise<User> {
@@ -43,6 +70,17 @@ export class AuthService implements OnModuleInit {
     }
 
     return user;
+  }
+
+  private async getTokens(user: User): Promise<Tokens> {
+    const tokens = await this.generateTokens(user);
+
+    await this.usersService.updateRefreshTokenHash(
+      user.id,
+      tokens.refreshToken,
+    );
+
+    return tokens;
   }
 
   private async generateTokens({ id, login }: User): Promise<Tokens> {
