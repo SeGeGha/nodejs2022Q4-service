@@ -4,7 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import { readFile } from 'fs/promises';
 import { AppModule } from './app.module';
-import { DEFAULT_PORT } from './constants';
+import { BASE_LOGGER_LEVELS, DEFAULT_PORT } from './constants';
 import { LoggerService } from './logger/logger.service';
 
 import('reflect-metadata');
@@ -12,7 +12,7 @@ import('reflect-metadata');
 const {
   PORT = DEFAULT_PORT,
   SWAGGER_YAML_PATH,
-  LOGGER_LEVEL = 1,
+  LOGGER_LEVEL = BASE_LOGGER_LEVELS.length,
 } = process.env;
 
 async function bootstrap() {

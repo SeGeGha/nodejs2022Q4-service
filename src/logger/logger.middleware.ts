@@ -1,9 +1,10 @@
-import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
+import { HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { LoggerService } from './logger.service';
-import { REQUEST } from '../constants';
+import { getLogMessage } from '../utils/getLogMessage';
+import { BASE_LOGGER_LEVELS, REQUEST } from '../constants';
 
-const { LOGGER_LEVEL = 1 } = process.env;
+const { LOGGER_LEVEL = BASE_LOGGER_LEVELS.length } = process.env;
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
@@ -13,13 +14,12 @@ export class LoggerMiddleware implements NestMiddleware {
     const { baseUrl, query, body } = req;
 
     res.on('finish', () => {
-      const message =
-        `URL: ${baseUrl}, ` +
-        `Query parameters: ${JSON.stringify(query)}, ` +
-        `Body: ${JSON.stringify(body)}, ` +
-        `Status code: ${res.statusCode}`;
+      const { statusCode } = res;
+      const message = getLogMessage(baseUrl, query, body, statusCode);
 
-      this.logger.log(message, REQUEST);
+      if (statusCode < HttpStatus.BAD_REQUEST) {
+        this.logger.log(message, REQUEST);
+      }
     });
 
     next();

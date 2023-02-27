@@ -2,6 +2,7 @@ export const DEFAULT_PORT = 4000;
 export const BEARER = 'Bearer';
 export const IS_PUBLIC_KEY = 'isPublic';
 export const REQUEST = 'REQUEST';
+export const ERROR = 'ERROR';
 
 export const MESSAGES = {
   USER_NOT_FOUND: 'User not found',
