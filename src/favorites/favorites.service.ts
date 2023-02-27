@@ -25,7 +25,7 @@ export class FavoritesService {
     private albumsRepository: Repository<Album>,
     @InjectRepository(Track)
     private tracksRepository: Repository<Track>,
-  ) { }
+  ) {}
 
   async findAll(): Promise<FavoriteResponse> {
     const favorite = await this.getFavorite();

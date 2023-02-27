@@ -17,7 +17,7 @@ import { Track } from './entities/track.entity';
 
 @Controller('track')
 export class TracksController {
-  constructor(private readonly tracksService: TracksService) { }
+  constructor(private readonly tracksService: TracksService) {}
 
   @Get()
   async findAll(): Promise<Track[]> {

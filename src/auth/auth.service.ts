@@ -11,7 +11,7 @@ import { MESSAGES } from '../constants';
 export class AuthService implements OnModuleInit {
   private usersService: UsersService;
 
-  constructor(private moduleRef: ModuleRef, private jwtService: JwtService) { }
+  constructor(private moduleRef: ModuleRef, private jwtService: JwtService) {}
 
   onModuleInit() {
     this.usersService = this.moduleRef.get(UsersService, { strict: false });

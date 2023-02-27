@@ -10,4 +10,4 @@ import { UsersModule } from '../users/users.module';
   providers: [AuthService],
   exports: [JwtModule],
 })
-export class AuthModule { }
+export class AuthModule {}
