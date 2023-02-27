@@ -12,9 +12,8 @@ import('reflect-metadata');
 const {
   PORT = DEFAULT_PORT,
   SWAGGER_YAML_PATH,
-  LOGGER_LEVELS = '',
+  LOGGER_LEVEL = 1,
 } = process.env;
-const LOGGER_LEVELS_LIST = LOGGER_LEVELS.split(',');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -30,7 +29,7 @@ async function bootstrap() {
     console.error(error.message);
   }
 
-  app.useLogger(new LoggerService(LOGGER_LEVELS_LIST));
+  app.useLogger(new LoggerService(Number(LOGGER_LEVEL)));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   await app.listen(PORT, () => {
